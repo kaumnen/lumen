@@ -13,6 +13,7 @@ load_dotenv()
 COLLECTION_NAME = "AWS_DOCS"
 
 qdrant_client = QdrantClient(host="localhost", port=6333)
+
 if not qdrant_client.collection_exists(collection_name=COLLECTION_NAME):
     qdrant_client.create_collection(
         collection_name=COLLECTION_NAME,
@@ -28,24 +29,26 @@ vector_store = QdrantVectorStore(
 )
 
 
-markdown_document = convert_pdf_to_markdown_document()
-text_chunks, metadatas = chunk_markdown(markdown_document)
+def ingest_chunks_from_pdf(url):
+    markdown_document = convert_pdf_to_markdown_document(url)
+    text_chunks, metadatas = chunk_markdown(markdown_document)
 
-documents = []
+    documents = []
 
-for i in range(len(text_chunks)):
-    document = Document(
-        page_content=text_chunks[i],
-        metadata=metadatas[i],
+    for i in range(len(text_chunks)):
+        document = Document(
+            page_content=text_chunks[i],
+            metadata=metadatas[i],
+        )
+        documents.append(document)
+
+    vector_store.add_documents(documents=documents)
+
+
+def search_vectors(query_text, limit=10):
+    results = vector_store.similarity_search(
+        query=query_text,
+        k=limit,
     )
-    documents.append(document)
 
-vector_store.add_documents(documents=documents)
-
-results = vector_store.similarity_search(
-    query="Uploading and downloading multiple files using zipped folders",
-    k=10,
-)
-
-for res in results:
-    print(f"* {res.page_content} [{res.metadata}]")
+    return results
