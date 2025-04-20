@@ -8,14 +8,23 @@ st.markdown(
 )
 
 with st.form(key="url_form"):
-    url_input = st.text_input("Enter URL:")
+    url_input = st.text_input(
+        "Enter URL:", placeholder="https://docs.aws.amazon.com/..."
+    )
+    st.markdown(
+        "Please ensure the URL is a valid AWS documentation link. For example: https://docs.aws.amazon.com/pdfs/AWSEC2/latest/UserGuide/ec2-ug.pdf"
+    )
 
     submitted = st.form_submit_button("Submit")
 
 if submitted:
     if url_input:
         parsed_url = urlparse(url_input)
-        if parsed_url.scheme == "https" and "docs.aws.amazon.com" in parsed_url.netloc:
+        if (
+            parsed_url.scheme == "https"
+            and "docs.aws.amazon.com" in parsed_url.netloc
+            and parsed_url.path.endswith(".pdf")
+        ):
             st.toast(f"URL Valid: {url_input}")
             with st.status("Processing PDF...", expanded=True) as status:
                 try:
@@ -29,5 +38,7 @@ if submitted:
                     status.update(
                         label=f"An error occurred: {e}", state="error", expanded=True
                     )
+        else:
+            st.warning("Please enter a valid URL.")
     else:
         st.warning("Please enter a URL.")
