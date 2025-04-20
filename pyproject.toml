@@ -9,7 +9,10 @@ dependencies = [
     "docling>=2.30.0",
     "langchain-aws>=0.2.21",
     "langchain-qdrant>=0.2.0",
+    "pymupdf>=1.25.5",
     "python-dotenv>=1.1.0",
     "qdrant-client>=1.12.1",
+    "requests>=2.32.3",
     "streamlit>=1.44.1",
+    "streamlit-pdf-viewer>=0.0.22",
 ]
