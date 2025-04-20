@@ -31,32 +31,32 @@ async def _async_embed_texts(texts: List[str]) -> List[List[float]]:
     return await embeddings.aembed_documents(texts)
 
 
-def ingest_chunks_from_pdf(url, status=None):
+def ingest_chunks_from_pdf(location, status=None):
     start_time = time.time()
 
     if status:
-        status.write("Parsing PDF...")
+        status.write("⚙️ Parsing PDF...")
     parse_start = time.time()
-    markdown_document = convert_pdf_to_markdown_document(url)
+    markdown_document = convert_pdf_to_markdown_document(location)
     parse_time = time.time() - parse_start
     if status:
-        status.write(f"PDF Parsed successfully in {parse_time:.2f} seconds.")
+        status.write(f"✅ PDF Parsed successfully in {parse_time:.2f} seconds.")
 
     if status:
-        status.write("Chunking text...")
+        status.write("⚙️ Chunking text...")
     chunk_start = time.time()
     text_chunks, metadatas = chunk_markdown(markdown_document)
     chunk_time = time.time() - chunk_start
     if status:
-        status.write(f"Text chunked successfully in {chunk_time:.2f} seconds.")
+        status.write(f"✅ Text chunked successfully in {chunk_time:.2f} seconds.")
 
     if status:
-        status.write("Generating embeddings asynchronously...")
+        status.write("⚙️ Generating vectors...")
     vector_start = time.time()
 
-    embeddings = asyncio.run(_async_embed_texts(text_chunks))
-
     client, collection_name = _setup_qdrant_client()
+
+    embeddings = asyncio.run(_async_embed_texts(text_chunks))
 
     points = []
     for i in range(len(text_chunks)):
@@ -73,7 +73,7 @@ def ingest_chunks_from_pdf(url, status=None):
     vector_time = time.time() - vector_start
     if status:
         status.write(
-            f"Vectors generated and stored successfully in {vector_time:.2f} seconds!"
+            f"✅ Generated and stored vectors successfully in {vector_time:.2f} seconds!"
         )
 
     total_time = time.time() - start_time
