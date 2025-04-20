@@ -8,28 +8,33 @@ from langchain_core.documents import Document
 
 from dotenv import load_dotenv
 
-load_dotenv()
 
-COLLECTION_NAME = "AWS_DOCS"
+def _setup_qdrant_client():
+    load_dotenv()
 
-qdrant_client = QdrantClient(host="localhost", port=6333)
+    COLLECTION_NAME = "AWS_DOCS"
 
-if not qdrant_client.collection_exists(collection_name=COLLECTION_NAME):
-    qdrant_client.create_collection(
+    qdrant_client = QdrantClient(host="localhost", port=6333)
+
+    if not qdrant_client.collection_exists(collection_name=COLLECTION_NAME):
+        qdrant_client.create_collection(
+            collection_name=COLLECTION_NAME,
+            vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
+        )
+
+    embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0")
+
+    vector_store = QdrantVectorStore(
+        client=qdrant_client,
         collection_name=COLLECTION_NAME,
-        vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
+        embedding=embeddings,
     )
 
-embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0")
-
-vector_store = QdrantVectorStore(
-    client=qdrant_client,
-    collection_name=COLLECTION_NAME,
-    embedding=embeddings,
-)
+    return vector_store
 
 
 def ingest_chunks_from_pdf(url):
+    vector_store = _setup_qdrant_client()
     markdown_document = convert_pdf_to_markdown_document(url)
     text_chunks, metadatas = chunk_markdown(markdown_document)
 
@@ -46,6 +51,7 @@ def ingest_chunks_from_pdf(url):
 
 
 def search_vectors(query_text, limit=10):
+    vector_store = _setup_qdrant_client()
     results = vector_store.similarity_search(
         query=query_text,
         k=limit,
