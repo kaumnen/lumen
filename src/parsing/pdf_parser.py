@@ -10,11 +10,7 @@ from docling.datamodel.base_models import InputFormat
 from docling.datamodel.settings import settings
 
 
-def convert_pdf_to_markdown_document():
-    source = (
-        "https://docs.aws.amazon.com/pdfs/cloudshell/latest/userguide/awscloudshell.pdf"
-    )
-
+def convert_pdf_to_markdown_document(source_location):
     settings.debug.profile_pipeline_timings = True
 
     accelerator_options = AcceleratorOptions()
@@ -36,7 +32,7 @@ def convert_pdf_to_markdown_document():
         },
     )
 
-    converter_result = converter.convert(source)
+    converter_result = converter.convert(source_location)
 
     doc_conversion_secs = converter_result.timings["pipeline_total"].times
     print(f"Conversion secs: {doc_conversion_secs}")
