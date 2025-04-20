@@ -32,6 +32,9 @@ if submitted:
                         vector.metadata["origin"]["filename"]
                         for vector in found_vectors
                     ],
+                    "Heading": [
+                        vector.metadata["headings"][0] for vector in found_vectors
+                    ],
                 }
             )
             st.dataframe(
@@ -51,6 +54,10 @@ if submitted:
                     "File Name": st.column_config.TextColumn(
                         "File Name",
                         width="small",
+                    ),
+                    "Heading": st.column_config.TextColumn(
+                        "Heading",
+                        width="large",
                     ),
                 },
             )
