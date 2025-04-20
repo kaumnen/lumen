@@ -1,11 +1,12 @@
 from ..parsing.pdf_parser import convert_pdf_to_markdown_document
 from .chunk import chunk_markdown
-from qdrant_client import QdrantClient
-from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams
 from langchain_aws import BedrockEmbeddings
 from langchain_core.documents import Document
 import time
+import asyncio
+from typing import List
 from dotenv import load_dotenv
 
 
@@ -22,20 +23,16 @@ def _setup_qdrant_client():
             vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
         )
 
+    return qdrant_client, COLLECTION_NAME
+
+
+async def _async_embed_texts(texts: List[str]) -> List[List[float]]:
     embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0")
-
-    vector_store = QdrantVectorStore(
-        client=qdrant_client,
-        collection_name=COLLECTION_NAME,
-        embedding=embeddings,
-    )
-
-    return vector_store
+    return await embeddings.aembed_documents(texts)
 
 
 def ingest_chunks_from_pdf(url, status=None):
     start_time = time.time()
-    vector_store = _setup_qdrant_client()
 
     if status:
         status.write("Parsing PDF...")
@@ -53,32 +50,58 @@ def ingest_chunks_from_pdf(url, status=None):
     if status:
         status.write(f"Text chunked successfully in {chunk_time:.2f} seconds.")
 
-    documents = []
-
-    for i in range(len(text_chunks)):
-        document = Document(
-            page_content=text_chunks[i],
-            metadata=metadatas[i],
-        )
-        documents.append(document)
-
     if status:
-        status.write("Storing vectors...")
+        status.write("Generating embeddings asynchronously...")
     vector_start = time.time()
-    vector_store.add_documents(documents=documents)
+
+    embeddings = asyncio.run(_async_embed_texts(text_chunks))
+
+    client, collection_name = _setup_qdrant_client()
+
+    points = []
+    for i in range(len(text_chunks)):
+        points.append(
+            models.PointStruct(
+                id=i,
+                payload={"page_content": text_chunks[i], **metadatas[i]},
+                vector=embeddings[i],
+            )
+        )
+
+    client.upsert(collection_name=collection_name, points=points)
+
     vector_time = time.time() - vector_start
     if status:
-        status.write(f"Vectors stored successfully in {vector_time:.2f} seconds!")
+        status.write(
+            f"Vectors generated and stored successfully in {vector_time:.2f} seconds!"
+        )
 
     total_time = time.time() - start_time
     return total_time
 
 
 def search_vectors(query_text, limit=10):
-    vector_store = _setup_qdrant_client()
-    results = vector_store.similarity_search(
-        query=query_text,
-        k=limit,
+    client, collection_name = _setup_qdrant_client()
+    embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0")
+
+    query_embedding = embeddings.embed_query(query_text)
+
+    search_result = client.search(
+        collection_name=collection_name,
+        query_vector=query_embedding,
+        limit=limit,
+        with_payload=True,
     )
+
+    results = []
+    for scored_point in search_result:
+        payload = scored_point.payload
+        page_content = payload.pop("page_content")
+
+        doc = Document(
+            page_content=page_content,
+            metadata=payload,
+        )
+        results.append(doc)
 
     return results
