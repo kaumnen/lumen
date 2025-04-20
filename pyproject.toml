@@ -5,7 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "boto3>=1.37.37",
     "docling>=2.30.0",
-    "fastembed-gpu>=0.4.2",
+    "langchain-aws>=0.2.21",
+    "langchain-qdrant>=0.2.0",
+    "python-dotenv>=1.1.0",
     "qdrant-client>=1.12.1",
 ]
