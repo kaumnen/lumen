@@ -5,7 +5,7 @@ from langchain_qdrant import QdrantVectorStore
 from qdrant_client.http.models import Distance, VectorParams
 from langchain_aws import BedrockEmbeddings
 from langchain_core.documents import Document
-
+import time
 from dotenv import load_dotenv
 
 
@@ -33,10 +33,25 @@ def _setup_qdrant_client():
     return vector_store
 
 
-def ingest_chunks_from_pdf(url):
+def ingest_chunks_from_pdf(url, status=None):
+    start_time = time.time()
     vector_store = _setup_qdrant_client()
+
+    if status:
+        status.write("Parsing PDF...")
+    parse_start = time.time()
     markdown_document = convert_pdf_to_markdown_document(url)
+    parse_time = time.time() - parse_start
+    if status:
+        status.write(f"PDF Parsed successfully in {parse_time:.2f} seconds.")
+
+    if status:
+        status.write("Chunking text...")
+    chunk_start = time.time()
     text_chunks, metadatas = chunk_markdown(markdown_document)
+    chunk_time = time.time() - chunk_start
+    if status:
+        status.write(f"Text chunked successfully in {chunk_time:.2f} seconds.")
 
     documents = []
 
@@ -47,7 +62,16 @@ def ingest_chunks_from_pdf(url):
         )
         documents.append(document)
 
+    if status:
+        status.write("Storing vectors...")
+    vector_start = time.time()
     vector_store.add_documents(documents=documents)
+    vector_time = time.time() - vector_start
+    if status:
+        status.write(f"Vectors stored successfully in {vector_time:.2f} seconds!")
+
+    total_time = time.time() - start_time
+    return total_time
 
 
 def search_vectors(query_text, limit=10):

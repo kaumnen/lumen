@@ -17,13 +17,17 @@ if submitted:
         parsed_url = urlparse(url_input)
         if parsed_url.scheme == "https" and "docs.aws.amazon.com" in parsed_url.netloc:
             st.toast(f"URL Valid: {url_input}")
-            with st.spinner("Processing..."):
-                ingest_chunks_from_pdf(url_input)
-            st.success("PDF processed and vectorized successfully!")
-        else:
-            st.error(
-                "**Invalid URL**\n\nThe URL must:\n- Use `HTTPS`\n- Be on the `docs.aws.amazon.com` domain",
-                icon="🚫",
-            )
+            with st.status("Processing PDF...", expanded=True) as status:
+                try:
+                    total_time = ingest_chunks_from_pdf(url_input, status=status)
+                    status.update(
+                        label=f"PDF processed and vectorized successfully in {total_time:.2f} seconds!",
+                        state="complete",
+                        expanded=False,
+                    )
+                except Exception as e:
+                    status.update(
+                        label=f"An error occurred: {e}", state="error", expanded=True
+                    )
     else:
         st.warning("Please enter a URL.")
