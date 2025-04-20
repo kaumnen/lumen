@@ -19,7 +19,7 @@ if submitted:
     if search_text:
         with st.spinner("Processing..."):
             found_vectors = search_vectors(search_text, limit=search_limit)
-        st.success("Search completed successfully!")
+        st.toast("✅ Search completed successfully!")
         if found_vectors:
             st.write("## Vector search results:")
             st.info("💡 Double-click any cell to see the full content", icon="ℹ️")
