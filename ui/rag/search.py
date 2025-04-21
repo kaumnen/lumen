@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 from src.vector_store.qdrant_manager import search_vectors
 
 st.title("Search Vectors")
@@ -28,12 +29,23 @@ if submitted:
                 {
                     "Result #": range(1, len(found_vectors) + 1),
                     "Content": [vector.page_content for vector in found_vectors],
-                    "File Name": [
-                        vector.metadata["origin"]["filename"]
+                    "File Name": "",
+                    "Headings": [
+                        " -> ".join(
+                            [
+                                str(vector.metadata.get(key)).strip()
+                                for key in sorted(
+                                    [
+                                        k
+                                        for k in vector.metadata
+                                        if re.match(r"Header \d+", k)
+                                    ],
+                                    key=lambda x: int(x.split(" ")[1]),
+                                )
+                                if vector.metadata.get(key)
+                            ]
+                        )
                         for vector in found_vectors
-                    ],
-                    "Heading": [
-                        vector.metadata["headings"][0] for vector in found_vectors
                     ],
                 }
             )
@@ -55,8 +67,8 @@ if submitted:
                         "File Name",
                         width="small",
                     ),
-                    "Heading": st.column_config.TextColumn(
-                        "Heading",
+                    "Headings": st.column_config.TextColumn(
+                        "Headings",
                         width="large",
                     ),
                 },
