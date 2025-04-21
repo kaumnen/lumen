@@ -8,7 +8,7 @@ pdf = st.Page("ui/rag/add_pdf.py", title="Add AWS Docs PDF", icon="👉")
 
 pg = st.navigation(
     {
-        "Chat": [chat],
+        "General": [chat],
         "Vectors": [pdf, search_vectors],
     }
 )
