@@ -4,7 +4,7 @@ import pymupdf
 def remove_toc_and_document_history_from_pdf(input_pdf_path, output_pdf_path):
     doc = pymupdf.open(input_pdf_path)
 
-    toc = doc.get_toc(simple=True)
+    toc = get_pdf_toc(input_pdf_path)
 
     for i in toc:
         _, heading, page_num = i
@@ -25,4 +25,12 @@ def remove_toc_and_document_history_from_pdf(input_pdf_path, output_pdf_path):
     doc.save(output_pdf_path)
     doc.close()
 
+    toc_after_cleanup = get_pdf_toc(output_pdf_path)
+    return toc_after_cleanup
+
+
+def get_pdf_toc(input_pdf_path):
+    doc = pymupdf.open(input_pdf_path)
+    toc = doc.get_toc(simple=True)
+    doc.close()
     return toc
