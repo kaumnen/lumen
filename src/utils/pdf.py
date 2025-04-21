@@ -25,4 +25,4 @@ def remove_toc_and_document_history_from_pdf(input_pdf_path, output_pdf_path):
     doc.save(output_pdf_path)
     doc.close()
 
-    return output_pdf_path
+    return toc
