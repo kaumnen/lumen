@@ -45,10 +45,14 @@ Keep your answers focused on the user's question.
 
     response = model_with_tools.invoke(messages_with_prompt, config=config)
 
-    if response.content:
+    if hasattr(response, "content"):
+        if isinstance(response.content, list):
+            content = " ".join(str(item) for item in response.content)
+        else:
+            content = str(response.content)
+
         pattern = r"<thinking>.*?</thinking>\s*"
-        cleaned_content = re.sub(pattern, "", response.content, flags=re.DOTALL).strip()
-        response.content = cleaned_content  # Update the response content
+        response.content = re.sub(pattern, "", content, flags=re.DOTALL).strip()
 
     print(f"--- Bedrock Model Response --- \n{response.content}")
     if response.tool_calls:
