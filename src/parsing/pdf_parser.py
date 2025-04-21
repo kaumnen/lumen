@@ -8,6 +8,8 @@ from docling.datamodel.pipeline_options import (
 from docling.datamodel.base_models import InputFormat
 
 from docling.datamodel.settings import settings
+from ..utils.pdf import get_pdf_toc
+from ..utils.md import adjust_markdown_headings
 
 
 def convert_pdf_to_markdown_document(source_location):
@@ -20,10 +22,10 @@ def convert_pdf_to_markdown_document(source_location):
     pipeline_options.accelerator_options.device = AcceleratorDevice.AUTO
     pipeline_options.accelerator_options.cuda_use_flash_attention2 = True
 
-    pipeline_options.do_ocr = False
+    pipeline_options.do_ocr = True
     pipeline_options.do_table_structure = True
-    pipeline_options.table_structure_options.do_cell_matching = False
-    pipeline_options.table_structure_options.mode = TableFormerMode.FAST
+    pipeline_options.table_structure_options.do_cell_matching = True
+    pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE
 
     converter = DocumentConverter(
         allowed_formats=[InputFormat.PDF],
@@ -37,6 +39,12 @@ def convert_pdf_to_markdown_document(source_location):
     doc_conversion_secs = converter_result.timings["pipeline_total"].times
     print(f"Conversion secs: {doc_conversion_secs}")
 
-    markdown_document = converter_result.document
+    markdown_document = converter_result.document.export_to_markdown()
 
-    return markdown_document
+    toc = get_pdf_toc(source_location)
+
+    markdown_document_with_fixed_headings = adjust_markdown_headings(
+        markdown_document, toc
+    )
+
+    return markdown_document_with_fixed_headings
