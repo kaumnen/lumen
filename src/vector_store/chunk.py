@@ -2,9 +2,10 @@ from langchain_text_splitters import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )
+from src.utils.pdf import get_pdf_title
 
 
-def chunk_markdown(markdown_document):
+def chunk_markdown(markdown_document, pdf_path):
     headers_to_split_on = [
         ("#", "Header 1"),
         ("##", "Header 2"),
@@ -33,5 +34,9 @@ def chunk_markdown(markdown_document):
 
     text_chunks = [doc.page_content for doc in filtered_splits]
     metadatas = [doc.metadata for doc in filtered_splits]
+
+    title = get_pdf_title(pdf_path)
+    for metadata in metadatas:
+        metadata["Document title"] = title
 
     return text_chunks, metadatas
