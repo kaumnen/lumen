@@ -6,7 +6,10 @@ def adjust_markdown_headings(markdown_doc, toc):
     processed_headings = set()
 
     for heading_info in toc:
-        level, heading_text, _ = heading_info
+        level, heading_text, page_num = heading_info
+
+        if page_num < 1:
+            continue
 
         heading_text = heading_text.strip()
         if not heading_text:
