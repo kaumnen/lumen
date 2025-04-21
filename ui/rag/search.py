@@ -29,7 +29,10 @@ if submitted:
                 {
                     "Result #": range(1, len(found_vectors) + 1),
                     "Content": [vector.page_content for vector in found_vectors],
-                    "File Name": "",
+                    "Document title": [
+                        vector.metadata.get("Document title", "")
+                        for vector in found_vectors
+                    ],
                     "Headings": [
                         " -> ".join(
                             [
@@ -63,8 +66,8 @@ if submitted:
                         width="large",
                         help="Double-click to view full content",
                     ),
-                    "File Name": st.column_config.TextColumn(
-                        "File Name",
+                    "Document title": st.column_config.TextColumn(
+                        "Document title",
                         width="small",
                     ),
                     "Headings": st.column_config.TextColumn(
