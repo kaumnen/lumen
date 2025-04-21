@@ -45,7 +45,7 @@ def ingest_chunks_from_pdf(location, status=None):
     if status:
         status.write("⚙️ Chunking text...")
     chunk_start = time.time()
-    text_chunks, metadatas = chunk_markdown(markdown_document)
+    text_chunks, metadatas = chunk_markdown(markdown_document, location)
     chunk_time = time.time() - chunk_start
     if status:
         status.write(f"✅ Text chunked successfully in {chunk_time:.2f} seconds.")
