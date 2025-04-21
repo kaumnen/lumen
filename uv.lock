@@ -97,30 +97,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.37.37"
+version = "1.37.38"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/82/8c/2ca661db6c9e591d9dc46149b43a91385283c852436ccba62e199643e196/boto3-1.37.37.tar.gz", hash = "sha256:752d31105a45e3e01c8c68471db14ae439990b75a35e72b591ca528e2575b28f", size = 111666 }
+sdist = { url = "https://files.pythonhosted.org/packages/0d/b5/d1c2e8c484cea43891629bbab6ca90ce9ca932586750bc0e786c8f096ccf/boto3-1.37.38.tar.gz", hash = "sha256:88c02910933ab7777597d1ca7c62375f52822e0aa1a8e0c51b2598a547af42b2", size = 111623 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/5f/032d93e74949222ffbfbc3270f29a3ee423fe648de8a31c49cce0cbb0a09/boto3-1.37.37-py3-none-any.whl", hash = "sha256:d125cb11e22817f7a2581bade4bf7b75247b401888890239ceb5d3e902ccaf38", size = 139917 },
+    { url = "https://files.pythonhosted.org/packages/d3/87/8189f22ee798177bc7b40afd13f046442c5f91b699e70a950b42ff447e80/boto3-1.37.38-py3-none-any.whl", hash = "sha256:b6d42803607148804dff82389757827a24ce9271f0583748853934c86310999f", size = 139922 },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.37.37"
+version = "1.37.38"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/96/d0/70969515e3ae8ff0fcccf22827d5d131bc7b8729331127415cf8f2861d63/botocore-1.37.37.tar.gz", hash = "sha256:3eadde6fed95c4cb469cc39d1c3558528b7fa76d23e7e16d4bddc77250431a64", size = 13828530 }
+sdist = { url = "https://files.pythonhosted.org/packages/34/79/4e072e614339727f79afef704e5993b5b4d2667c1671c757cc4deb954744/botocore-1.37.38.tar.gz", hash = "sha256:c3ea386177171f2259b284db6afc971c959ec103fa2115911c4368bea7cbbc5d", size = 13832365 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/17/602915b29cb695e1e66f65e33b1026f1534e49975d99ea4e32e58d963542/botocore-1.37.37-py3-none-any.whl", hash = "sha256:eb730ff978f47c02f0c8ed07bccdc0db6d8fa098ed32ac31bee1da0e9be480d1", size = 13495584 },
+    { url = "https://files.pythonhosted.org/packages/55/1b/93f3504afc7c523dcaa8a8147cfc75421983e30b08d9f93a533929589630/botocore-1.37.38-py3-none-any.whl", hash = "sha256:23b4097780e156a4dcaadfc1ed156ce25cb95b6087d010c4bb7f7f5d9bc9d219", size = 13499391 },
 ]
 
 [[package]]
@@ -829,7 +829,7 @@ wheels = [
 
 [[package]]
 name = "langchain-core"
-version = "0.3.54"
+version = "0.3.55"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonpatch" },
@@ -840,9 +840,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/df/e7/d649de03ddf3427e3e45107936f7fd048a4eea91db6ca56fd9b3b2d28c85/langchain_core-0.3.54.tar.gz", hash = "sha256:55ce38939038e19b1271f36f512335462d7f64057b531598b3651d2b403e1b42", size = 553286 }
+sdist = { url = "https://files.pythonhosted.org/packages/d2/8e/73de0e8cf1015c2a1b4cf3944c84678e8cdf83b8074f959cbf03ce466c76/langchain_core-0.3.55.tar.gz", hash = "sha256:0f2b3e311621116a83510c70b0ac9d959030a0a457a69483535cff18501fedc9", size = 553841 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/f4/413c051df2c63cb21455ad97f221edd359c2d2b070616f3697e0b7ce14cd/langchain_core-0.3.54-py3-none-any.whl", hash = "sha256:cd42155d9089e2fd4695ee02a4b2bc6daf55b9d4e1a37639647cf2455ed4fa04", size = 433875 },
+    { url = "https://files.pythonhosted.org/packages/49/75/fcfc1a545ad0e889c4201a133ed68772c20190037670c82ac35fce1aabec/langchain_core-0.3.55-py3-none-any.whl", hash = "sha256:b3cb36bf37755a616158a79866657c6697b43a2f7c69dd723ce425f1c76c1baa", size = 434116 },
 ]
 
 [[package]]
@@ -858,6 +858,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f2/8c/f006636b4cc2d95ba072a57df3f2f99d8cf7cb47a79cc447a7e3e391f7ee/langchain_qdrant-0.2.0.tar.gz", hash = "sha256:41b8573cbb1b4706f76dc769251d8e6b3e4107ecd5fa97c58141977ec19fba75", size = 21429 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/68/01/22dad84373ba282237a3351547443c9c94c39fe75f71a1759f97cfa89725/langchain_qdrant-0.2.0-py3-none-any.whl", hash = "sha256:8eab5b8a553204ddb809d8183a6f1bc12fc265688592d9d897388f6939c79bf8", size = 23406 },
+]
+
+[[package]]
+name = "langchain-text-splitters"
+version = "0.3.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e7/ac/b4a25c5716bb0103b1515f1f52cc69ffb1035a5a225ee5afe3aed28bf57b/langchain_text_splitters-0.3.8.tar.gz", hash = "sha256:116d4b9f2a22dda357d0b79e30acf005c5518177971c66a9f1ab0edfdb0f912e", size = 42128 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/a3/3696ff2444658053c01b6b7443e761f28bb71217d82bb89137a978c5f66f/langchain_text_splitters-0.3.8-py3-none-any.whl", hash = "sha256:e75cc0f4ae58dcf07d9f18776400cf8ade27fadd4ff6d264df6278bb302f6f02", size = 32440 },
 ]
 
 [[package]]
@@ -963,6 +975,7 @@ dependencies = [
     { name = "docling" },
     { name = "langchain-aws" },
     { name = "langchain-qdrant" },
+    { name = "langchain-text-splitters" },
     { name = "langgraph" },
     { name = "pymupdf" },
     { name = "python-dotenv" },
@@ -979,6 +992,7 @@ requires-dist = [
     { name = "docling", specifier = ">=2.30.0" },
     { name = "langchain-aws", specifier = ">=0.2.21" },
     { name = "langchain-qdrant", specifier = ">=0.2.0" },
+    { name = "langchain-text-splitters", specifier = ">=0.3.8" },
     { name = "langgraph", specifier = ">=0.3.31" },
     { name = "pymupdf", specifier = ">=1.25.5" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
