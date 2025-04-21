@@ -1,14 +1,37 @@
-from docling.chunking import HybridChunker
+from langchain_text_splitters import (
+    MarkdownHeaderTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
 
 
 def chunk_markdown(markdown_document):
-    text_chunks, metadatas = [], []
+    headers_to_split_on = [
+        ("#", "Header 1"),
+        ("##", "Header 2"),
+        ("###", "Header 3"),
+        ("####", "Header 4"),
+    ]
 
-    chunker = HybridChunker(tokenizer="sentence-transformers/all-MiniLM-L6-v2")
-    chunk_iter = chunker.chunk(markdown_document)
+    markdown_splitter = MarkdownHeaderTextSplitter(
+        headers_to_split_on=headers_to_split_on
+    )
 
-    for chunk in chunk_iter:
-        text_chunks.append(chunk.text)
-        metadatas.append(chunk.meta.export_json_dict())
+    md_header_splits = markdown_splitter.split_text(markdown_document)
+
+    chunk_size = 50000
+    chunk_overlap = 500
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size, chunk_overlap=chunk_overlap
+    )
+
+    splits = text_splitter.split_documents(md_header_splits)
+
+    min_chunk_length = 20
+    filtered_splits = [
+        doc for doc in splits if len(doc.page_content.strip()) >= min_chunk_length
+    ]
+
+    text_chunks = [doc.page_content for doc in filtered_splits]
+    metadatas = [doc.metadata for doc in filtered_splits]
 
     return text_chunks, metadatas
