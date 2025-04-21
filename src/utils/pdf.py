@@ -34,3 +34,10 @@ def get_pdf_toc(input_pdf_path):
     toc = doc.get_toc(simple=True)
     doc.close()
     return toc
+
+
+def get_pdf_title(input_pdf_path):
+    doc = pymupdf.open(input_pdf_path)
+    title = doc.metadata.get("title", "Untitled")
+    doc.close()
+    return title
