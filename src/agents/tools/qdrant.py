@@ -14,7 +14,7 @@ def search_local_aws_docs(query: str, num_results: int = 5) -> str:
     """
     Searches the locally stored and vectorized AWS documentation PDFs for relevant information based on the user's query.
     Use this tool when the user asks questions about AWS services, features, or procedures that might be found in the ingested PDF documents.
-    Provide the user's specific question or topic as the 'query'.
+    You can provide the user's specific question as the 'query' either raw or optimized if you think it will improve the search results.
     You can optionally specify 'num_results' (default is 5) for the number of search results to retrieve.
     """
     print("--- Executing Qdrant Search Tool ---")
