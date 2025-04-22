@@ -42,9 +42,9 @@ def ingest_chunks_from_pdf(location, status=None, mode="regular"):
     parse_start = time.time()
     markdown_document = None
 
-    if mode == "fast":
+    if "fast" in mode:
         markdown_document = convert_pdf_to_markdown_document_pymupdf4llm(location)
-    elif mode == "regular":
+    elif "regular" in mode:
         markdown_document = convert_pdf_to_markdown_document_docling(location)
 
     parse_time = time.time() - parse_start
