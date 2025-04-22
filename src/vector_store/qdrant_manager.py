@@ -13,7 +13,7 @@ from typing import List
 from dotenv import load_dotenv
 
 
-def _setup_qdrant_client():
+def setup_qdrant_client():
     load_dotenv()
 
     COLLECTION_NAME = "AWS_DOCS"
@@ -64,7 +64,7 @@ def ingest_chunks_from_pdf(location, status=None, mode="regular"):
         status.write("⚙️ Generating vectors...")
     vector_start = time.time()
 
-    client, collection_name = _setup_qdrant_client()
+    client, collection_name = setup_qdrant_client()
 
     embeddings = asyncio.run(_async_embed_texts(text_chunks))
 
@@ -91,7 +91,7 @@ def ingest_chunks_from_pdf(location, status=None, mode="regular"):
 
 
 def search_vectors(query_text, limit=10):
-    client, collection_name = _setup_qdrant_client()
+    client, collection_name = setup_qdrant_client()
     embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0")
 
     query_embedding = embeddings.embed_query(query_text)
