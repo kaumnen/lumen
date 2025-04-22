@@ -17,6 +17,11 @@ tab1, tab2 = st.tabs(["💾 Upload PDF", "🔗 PDF from URL"])
 with tab1:
     with st.form(key="pdf_upload_form", clear_on_submit=True, border=False):
         uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+        mode = st.radio(
+            "Processing Mode",
+            ["Fast", "Regular"],
+            help="Fast mode is recommended for about 7x faster processing based on preliminary testing.",
+        )
         submit_button = st.form_submit_button("Process PDF")
         if uploaded_file is not None and submit_button:
             with st.status("Processing PDF...", expanded=True) as status:
@@ -41,7 +46,9 @@ with tab1:
                         f"✅ PDF optimization completed in {pdf_optimization_time:.2f} seconds."
                     )
 
-                    total_time = ingest_chunks_from_pdf(output_path, status=status)
+                    total_time = ingest_chunks_from_pdf(
+                        output_path, status=status, mode=mode.lower()
+                    )
 
                     os.unlink(input_path)
                     os.unlink(output_path)
@@ -62,6 +69,11 @@ with tab2:
     with st.form(key="url_form", clear_on_submit=True, border=False):
         url_input = st.text_input(
             "Enter URL:", placeholder="https://docs.aws.amazon.com/..."
+        )
+        mode = st.radio(
+            "Processing Mode",
+            ["Fast", "Regular"],
+            help="Fast mode is recommended for about 7x faster processing based on preliminary testing.",
         )
         st.markdown(
             "Please ensure the URL is a valid AWS documentation link. For example: https://docs.aws.amazon.com/pdfs/AWSEC2/latest/UserGuide/ec2-ug.pdf"
@@ -126,7 +138,9 @@ with tab2:
                             f"✅ PDF optimization completed in {pdf_optimization_time:.2f} seconds."
                         )
 
-                        total_time = ingest_chunks_from_pdf(output_path, status=status)
+                        total_time = ingest_chunks_from_pdf(
+                            output_path, status=status, mode=mode.lower()
+                        )
 
                         os.unlink(input_path)
                         os.unlink(output_path)
