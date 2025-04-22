@@ -8,11 +8,12 @@ from docling.datamodel.pipeline_options import (
 from docling.datamodel.base_models import InputFormat
 
 from docling.datamodel.settings import settings
+import pymupdf4llm
 from ..utils.pdf import get_pdf_toc
 from ..utils.md import adjust_markdown_headings
 
 
-def convert_pdf_to_markdown_document(source_location):
+def convert_pdf_to_markdown_document_docling(source_location):
     settings.debug.profile_pipeline_timings = True
 
     accelerator_options = AcceleratorOptions()
@@ -48,3 +49,11 @@ def convert_pdf_to_markdown_document(source_location):
     )
 
     return markdown_document_with_fixed_headings
+
+
+def convert_pdf_to_markdown_document_pymupdf4llm(source_location):
+    markdown_document = pymupdf4llm.to_markdown(
+        source_location, ignore_images=True, ignore_graphics=True, show_progress=True
+    )
+
+    return markdown_document
