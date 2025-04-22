@@ -15,11 +15,34 @@ from src.vector_store.qdrant_manager import ingest_chunks_from_pdf
 from src.utils.pdf import remove_toc_and_document_history_from_pdf
 
 st.title("Add AWS Docs PDF")
+
+with st.sidebar:
+    st.markdown(
+        """
+    This page allows you to add a PDF to the vector database. The PDF fille will be:
+    - optimized
+    - parsed
+    - vectorized and stored
+    - made available for use by the agent system powering [the chat interface](/)
+    """
+    )
+
+    st.info(
+        "The PDF ingestion process is optimized for AWS documentation.",
+        icon="ℹ️",
+    )
+
 st.markdown(
-    "This page allows you to add a PDF from AWS documentation. The PDF will be:\n- optimized\n- parsed\n- vectorized and stored in the vector database"
+    """
+Feel free to submit:
+- AWS Documentation PDF
+	- AWS Documentation home: https://docs.aws.amazon.com/
+- AWS Whitepaper, Decision Guide or Technical guide
+	- Find more here: https://aws.amazon.com/whitepapers
+"""
 )
 st.info(
-    "With Fast mode - you can track the progress of the PDF processing in the console.",
+    "With Fast mode - you can track the progress of the **PDF parsing process** in the console.",
     icon="ℹ️",
 )
 
