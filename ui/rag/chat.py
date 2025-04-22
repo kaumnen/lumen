@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from langchain_core.messages import (
     HumanMessage,
     AIMessage,
@@ -27,9 +28,32 @@ if "session_id" not in st.session_state:
 
 with st.sidebar:
     st.header("Session Info")
-    st.write(f"Messages: {st.session_state.get('message_count', 0)}")
-    st.write(f"Tool Calls: {st.session_state.get('tool_calls_count', 0)}")
-    st.write(f"Total Tokens: {st.session_state.get('token_count', 0)}")
+
+    info_data = {
+        "Metric": ["Messages", "Tool Calls", "Total Tokens"],
+        "Value": [
+            str(st.session_state.get("message_count", 0)),
+            str(st.session_state.get("tool_calls_count", 0)),
+            str(st.session_state.get("token_count", 0)),
+        ],
+    }
+    info_df = pd.DataFrame(info_data)
+
+    st.dataframe(
+        info_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Metric": st.column_config.TextColumn(
+                "Metric",
+                width="medium",
+            ),
+            "Value": st.column_config.TextColumn(
+                "Value",
+                width="small",
+            ),
+        },
+    )
 
     if st.button("Clear Chat History"):
         st.session_state.messages = []
