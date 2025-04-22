@@ -1,9 +1,16 @@
 import streamlit as st
+import asyncio
 from urllib.parse import urlparse
 import tempfile
 import os
 import time
 import requests
+
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
 from src.vector_store.qdrant_manager import ingest_chunks_from_pdf
 from src.utils.pdf import remove_toc_and_document_history_from_pdf
 

@@ -1,19 +1,19 @@
-from docling.document_converter import DocumentConverter, PdfFormatOption
-from docling.datamodel.pipeline_options import (
-    PdfPipelineOptions,
-    AcceleratorDevice,
-    AcceleratorOptions,
-    TableFormerMode,
-)
-from docling.datamodel.base_models import InputFormat
-
-from docling.datamodel.settings import settings
 import pymupdf4llm
 from ..utils.pdf import get_pdf_toc
 from ..utils.md import adjust_markdown_headings
 
 
 def convert_pdf_to_markdown_document_docling(source_location):
+    from docling.document_converter import DocumentConverter, PdfFormatOption
+    from docling.datamodel.pipeline_options import (
+        PdfPipelineOptions,
+        AcceleratorDevice,
+        AcceleratorOptions,
+        TableFormerMode,
+    )
+    from docling.datamodel.base_models import InputFormat
+    from docling.datamodel.settings import settings
+
     settings.debug.profile_pipeline_timings = True
 
     accelerator_options = AcceleratorOptions()
