@@ -73,7 +73,7 @@ with tab2:
         mode = st.radio(
             "Processing Mode",
             ["Fast", "Regular"],
-            help="Fast mode is recommended for about 7x faster processing based on preliminary testing.",
+            help="Fast mode is recommended as it is about 7x faster processing based on preliminary testing.",
         )
         st.markdown(
             "Please ensure the URL is a valid AWS documentation link. For example: https://docs.aws.amazon.com/pdfs/AWSEC2/latest/UserGuide/ec2-ug.pdf"
