@@ -19,7 +19,7 @@ def chunk_markdown(markdown_document, pdf_path):
 
     md_header_splits = markdown_splitter.split_text(markdown_document)
 
-    chunk_size = 50000
+    chunk_size = 10000
     chunk_overlap = 500
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
