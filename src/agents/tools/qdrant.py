@@ -6,8 +6,8 @@ from langchain_core.documents import Document
 from typing import List
 import re
 
-MAX_CHARS_PER_RESULT = 2000
-MAX_TOTAL_CHARS = 10000
+MAX_CHARS_PER_RESULT = 10000
+MAX_TOTAL_CHARS = 50000
 
 
 @tool
