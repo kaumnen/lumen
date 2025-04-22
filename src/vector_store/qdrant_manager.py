@@ -1,4 +1,7 @@
-from ..parsing.pdf_parser import convert_pdf_to_markdown_document
+from ..parsing.pdf_parser import (
+    convert_pdf_to_markdown_document_docling,
+    convert_pdf_to_markdown_document_pymupdf4llm,
+)
 from .chunk import chunk_markdown
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Distance, VectorParams
@@ -31,13 +34,19 @@ async def _async_embed_texts(texts: List[str]) -> List[List[float]]:
     return await embeddings.aembed_documents(texts)
 
 
-def ingest_chunks_from_pdf(location, status=None):
+def ingest_chunks_from_pdf(location, status=None, mode="regular"):
     start_time = time.time()
 
     if status:
         status.write("⚙️ Parsing PDF...")
     parse_start = time.time()
-    markdown_document = convert_pdf_to_markdown_document(location)
+    markdown_document = None
+
+    if mode == "fast":
+        markdown_document = convert_pdf_to_markdown_document_pymupdf4llm(location)
+    elif mode == "regular":
+        markdown_document = convert_pdf_to_markdown_document_docling(location)
+
     parse_time = time.time() - parse_start
     if status:
         status.write(f"✅ PDF Parsed successfully in {parse_time:.2f} seconds.")
@@ -45,6 +54,7 @@ def ingest_chunks_from_pdf(location, status=None):
     if status:
         status.write("⚙️ Chunking text...")
     chunk_start = time.time()
+
     text_chunks, metadatas = chunk_markdown(markdown_document, location)
     chunk_time = time.time() - chunk_start
     if status:
