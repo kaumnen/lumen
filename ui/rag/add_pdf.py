@@ -16,7 +16,11 @@ from src.utils.pdf import remove_toc_and_document_history_from_pdf
 
 st.title("Add AWS Docs PDF")
 st.markdown(
-    "This page allows you to add a PDF from AWS documentation. The PDF will be:\n- parsed\n- vectorized and\n- stored in the vector database"
+    "This page allows you to add a PDF from AWS documentation. The PDF will be:\n- optimized\n- parsed\n- vectorized and stored in the vector database"
+)
+st.info(
+    "With Fast mode - you can track the progress of the PDF processing in the console.",
+    icon="ℹ️",
 )
 
 tab1, tab2 = st.tabs(["💾 Upload PDF", "🔗 PDF from URL"])
@@ -26,8 +30,8 @@ with tab1:
         uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
         mode = st.radio(
             "Processing Mode",
-            ["Fast", "Regular"],
-            help="Fast mode is recommended for about 7x faster processing based on preliminary testing.",
+            ["Fast (New)", "Regular (Slower)"],
+            help="Fast mode is recommended for about 7x faster processing based on preliminary testing. Accuracy is very similar to the regular mode.",
         )
         submit_button = st.form_submit_button("Process PDF")
         if uploaded_file is not None and submit_button:
