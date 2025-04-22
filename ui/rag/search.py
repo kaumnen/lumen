@@ -2,11 +2,61 @@ import streamlit as st
 import pandas as pd
 import re
 from src.vector_store.qdrant_manager import search_vectors
+from src.utils.qdrant import get_collection_metadata
+
 
 st.title("Search Vectors")
-st.markdown(
-    "This page allows you to search vectors in the database. You can use the search bar below to find relevant information."
-)
+
+with st.sidebar:
+    st.markdown(
+        """
+    This page allows you to **search vectors** stored in the vector database. 
+    
+    You can use the search bar below and adjust the number of results to find relevant information.
+    
+"""
+    )
+
+    st.markdown("---")
+
+    st.header("VectorDB Info")
+    vector_count, collection_status, optimizer_status = get_collection_metadata()
+
+    status_map = {
+        "green": "🟢",
+        "yellow": "🟡",
+        "red": "🔴",
+        "grey": "🟠",
+        "ok": "🟢",
+    }
+    collection_status_display = status_map.get(collection_status, "❓ Unknown status")
+    optimizer_status_display = status_map.get(optimizer_status, "❓ Unknown status")
+
+    info_data = {
+        "Metric": ["Collection Status", "Optimizer Status", "Vector Count"],
+        "Value": [
+            collection_status_display,
+            optimizer_status_display,
+            str(vector_count),
+        ],
+    }
+    info_df = pd.DataFrame(info_data)
+
+    st.dataframe(
+        info_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Metric": st.column_config.TextColumn(
+                "Metric",
+                width="medium",
+            ),
+            "Value": st.column_config.TextColumn(
+                "Value",
+                width="medium",
+            ),
+        },
+    )
 
 with st.form(key="search_text_form"):
     search_text = st.text_input("Enter content:")
