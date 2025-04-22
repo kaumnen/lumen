@@ -4,9 +4,10 @@ from ...vector_store.qdrant_manager import (
 )
 from langchain_core.documents import Document
 from typing import List
+import re
 
-MAX_CHARS_PER_RESULT = 1000
-MAX_TOTAL_CHARS = 4000
+MAX_CHARS_PER_RESULT = 2000
+MAX_TOTAL_CHARS = 10000
 
 
 @tool
@@ -30,7 +31,18 @@ def search_local_aws_docs(query: str, num_results: int = 5) -> str:
 
         for i, doc in enumerate(found_docs):
             page_content = doc.page_content.strip()
-            metadata_info = f"(Source: {doc.metadata.get('origin', {}).get('filename', 'N/A')}, Heading: {doc.metadata.get('headings', ['N/A'])[0]})"
+            headers = " -> ".join(
+                [
+                    str(doc.metadata.get(key)).strip()
+                    for key in sorted(
+                        [k for k in doc.metadata if re.match(r"Header \d+", k)],
+                        key=lambda x: int(x.split(" ")[1]),
+                    )
+                    if doc.metadata.get(key)
+                ]
+            )
+
+            metadata_info = f"(Source: {doc.metadata.get('Document title', 'N/A')}, Heading(s): {headers})"
 
             # Truncate individual result if too long
             truncated_content = page_content[:MAX_CHARS_PER_RESULT]
