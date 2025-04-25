@@ -14,7 +14,7 @@ except RuntimeError:
 from src.vector_store.qdrant_manager import ingest_chunks_from_pdf
 from src.utils.pdf import remove_toc_and_document_history_from_pdf
 
-st.title("Add AWS Docs PDF")
+st.title("Add AWS Documentation in PDF format")
 
 with st.sidebar:
     st.markdown(
@@ -23,7 +23,7 @@ with st.sidebar:
     - optimized
     - parsed
     - vectorized and stored
-    - made available for use by the agent system powering [the chat interface](/)
+    - made available for use by the agent system powering the [Agent Chat](/) interface
     """
     )
 
@@ -41,14 +41,28 @@ Feel free to submit:
 	- Find more here: https://aws.amazon.com/whitepapers
 """
 )
+
 st.info(
     "With Fast mode - you can track the progress of the **PDF parsing process** in the console.",
     icon="ℹ️",
 )
 
+
 tab1, tab2 = st.tabs(["💾 Upload PDF", "🔗 PDF from URL"])
 
 with tab1:
+    with st.expander("⬇️ How to get AWS documentation in PDF format"):
+        st.image(
+            "ui/images/get-pdf.png",
+            caption="Click on the PDF icon in the top left part of the documentation page",
+            use_container_width=True,
+        )
+        st.image(
+            "ui/images/download-pdf.png",
+            caption="Click on the download icon in the top right part of the PDF viewer page",
+            use_container_width=True,
+        )
+
     with st.form(key="pdf_upload_form", clear_on_submit=True, border=False):
         uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
         mode = st.radio(
@@ -100,13 +114,25 @@ with tab1:
                     )
 
 with tab2:
+    with st.expander("⬇️ How to get AWS PDF format documentation URL"):
+        st.image(
+            "ui/images/get-pdf.png",
+            caption="Click on the PDF icon in the top left part of the documentation page",
+            use_container_width=True,
+        )
+        st.image(
+            "ui/images/get-pdf-url.png",
+            caption="Copy the URL from the address bar of your browser",
+            use_container_width=True,
+        )
+
     with st.form(key="url_form", clear_on_submit=True, border=False):
         url_input = st.text_input(
             "Enter URL:", placeholder="https://docs.aws.amazon.com/..."
         )
         mode = st.radio(
             "Processing Mode",
-            ["Fast", "Regular"],
+            ["Fast (New)", "Regular (Slower)"],
             help="Fast mode is recommended as it is about 7x faster processing based on preliminary testing.",
         )
         st.markdown(
