@@ -33,20 +33,30 @@ class MCPChatClient:
                 "transport": "stdio",
             },
         }
+        self._initialize_model()
+
+    def _initialize_model(self, model_id: str = "amazon.nova-pro-v1:0"):
+        logger.info(f"Initializing model: {model_id}")
         self.model = ChatBedrock(
-            model_id="amazon.nova-pro-v1:0",
+            model_id=model_id,
             streaming=True,
             model_kwargs={"temperature": 0.7},
         )
 
     async def process_chat(
-        self, prompt: str, session_id: str, messages: Optional[List[Any]] = None
+        self,
+        prompt: str,
+        session_id: str,
+        messages: Optional[List[Any]] = None,
+        model: str = "amazon.nova-pro-v1:0",
     ) -> tuple[AIMessage, List[Dict]]:
         """Process a chat message with full conversation history."""
         if messages is None:
             messages = []
 
-        logger.info(f"Processing chat for session {session_id}")
+        logger.info(f"Processing chat for session {session_id} with model {model}")
+
+        self._initialize_model(model_id=model)
 
         async with MultiServerMCPClient(self.mcp_servers) as client:
             try:

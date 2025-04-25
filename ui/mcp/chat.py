@@ -32,6 +32,34 @@ if "mcp_client" not in st.session_state:
 
 
 with st.sidebar:
+    st.header("Model Settings")
+    model_options = {
+        "Amazon Nova Pro": "amazon.nova-pro-v1:0",
+        "Amazon Nova Micro": "amazon.nova-micro-v1:0",
+        "Amazon Nova Lite": "amazon.nova-lite-v1:0",
+    }
+    selected_model_name = st.selectbox(
+        "Choose Model",
+        list(model_options.keys()),
+        help="Select the model to use for chat responses",
+    )
+    selected_model = model_options[selected_model_name]
+
+    if (
+        "selected_model" not in st.session_state
+        or st.session_state.selected_model != selected_model
+    ):
+        st.session_state.selected_model = selected_model
+        if len(st.session_state.messages) > 0:
+            st.info("Model changed - Starting new conversation")
+            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.messages = []
+            st.session_state.message_count = 0
+            st.session_state.tool_calls_count = 0
+            st.rerun()
+
+    st.divider()
+
     st.header("Active MCP Servers")
     if "mcp_client" in st.session_state:
         server_urls = {
@@ -117,6 +145,7 @@ if prompt := st.chat_input("Ask a question..."):
                         prompt=prompt,
                         session_id=st.session_state.session_id,
                         messages=st.session_state.messages[:-1],
+                        model=st.session_state.selected_model,
                     )
                 )
 
