@@ -11,8 +11,10 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-st.title("🤖 MCP Chat Assistant")
-st.write("add this")
+st.title("Chat with AWS MCP Servers")
+st.success(
+    "Ask me questions about AWS services. I can search online documentation. Powered by [AWS MCP Servers](https://github.com/awslabs/mcp)."
+)
 
 
 if "session_id" not in st.session_state:
