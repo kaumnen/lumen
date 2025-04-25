@@ -11,8 +11,10 @@ import traceback
 import json
 
 
-st.title("🤖 AWS Chat Assistant")
-st.write("Ask me questions about AWS services. I can search local documentation.")
+st.title("Chat with local AWS Docs")
+st.success(
+    "Ask me questions about AWS services. I can search local documentation. You can [submit PDFs](/add_pdf) to the local vector database."
+)
 
 
 if "session_id" not in st.session_state:
