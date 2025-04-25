@@ -7,7 +7,9 @@ requires-python = ">=3.10"
 dependencies = [
     "boto3>=1.37.37",
     "docling>=2.30.0",
+    "fastmcp>=2.2.3",
     "langchain-aws>=0.2.21",
+    "langchain-mcp-adapters>=0.0.9",
     "langchain-qdrant>=0.2.0",
     "langchain-text-splitters>=0.3.8",
     "langgraph>=0.3.31",
