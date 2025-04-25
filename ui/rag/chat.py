@@ -11,7 +11,7 @@ import traceback
 import json
 
 
-st.title("💬 AWS Chat Assistant")
+st.title("🤖 AWS Chat Assistant")
 st.write("Ask me questions about AWS services. I can search local documentation.")
 
 
