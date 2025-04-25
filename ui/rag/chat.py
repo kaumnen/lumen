@@ -29,6 +29,34 @@ if "session_id" not in st.session_state:
 
 
 with st.sidebar:
+    st.header("Model Settings")
+    model_options = {
+        "Amazon Nova Pro": "amazon.nova-pro-v1:0",
+        "Amazon Nova Micro": "amazon.nova-micro-v1:0",
+        "Amazon Nova Lite": "amazon.nova-lite-v1:0",
+    }
+    selected_model_name = st.selectbox(
+        "Choose Model",
+        list(model_options.keys()),
+        help="Select the model to use for chat responses",
+    )
+    selected_model = model_options[selected_model_name]
+
+    if (
+        "selected_model" not in st.session_state
+        or st.session_state.selected_model != selected_model
+    ):
+        st.session_state.selected_model = selected_model
+        if len(st.session_state.messages) > 0:
+            st.info("Model changed - Starting new conversation")
+            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.messages = []
+            st.session_state.message_count = 0
+            st.session_state.tool_calls_count = 0
+            st.session_state.token_count = 0
+            st.rerun()
+
+    st.divider()
     st.header("Session Info")
 
     info_data = {
@@ -103,7 +131,12 @@ if prompt := st.chat_input("Ask about AWS..."):
 
     agent_input = {"messages": [user_message]}
 
-    config = {"configurable": {"thread_id": st.session_state.session_id}}
+    config = {
+        "configurable": {
+            "thread_id": st.session_state.session_id,
+            "model": st.session_state.selected_model,
+        }
+    }
     print(f"Invoking agent with config: {config}")
 
     with st.chat_message("assistant"):

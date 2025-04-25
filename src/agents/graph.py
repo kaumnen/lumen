@@ -26,8 +26,11 @@ def should_continue(state: AgentState) -> Literal["continue", "end"]:
 
 def call_model(state: AgentState, config: RunnableConfig):
     print("--- Calling Bedrock Model ---")
+    model_id = config.get("configurable", {}).get("model", "amazon.nova-micro-v1:0")
+    print(f"Using model: {model_id}")
+
     model = ChatBedrock(
-        model_id="amazon.nova-micro-v1:0",
+        model_id=model_id,
     )
     model_with_tools = model.bind_tools([search_local_aws_docs])
 
