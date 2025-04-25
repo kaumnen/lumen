@@ -34,9 +34,9 @@ if "mcp_client" not in st.session_state:
 with st.sidebar:
     st.header("Model Settings")
     model_options = {
-        "Amazon Nova Pro": "amazon.nova-pro-v1:0",
         "Amazon Nova Micro": "amazon.nova-micro-v1:0",
         "Amazon Nova Lite": "amazon.nova-lite-v1:0",
+        "Amazon Nova Pro": "amazon.nova-pro-v1:0",
     }
     selected_model_name = st.selectbox(
         "Choose Model",
