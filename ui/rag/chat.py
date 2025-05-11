@@ -86,7 +86,7 @@ with st.sidebar:
         },
     )
 
-    if st.button("Clear Chat History"):
+    if st.button("New Conversation"):
         st.session_state.messages = []
         st.session_state.session_id = str(uuid.uuid4())
         st.session_state.message_count = 0
