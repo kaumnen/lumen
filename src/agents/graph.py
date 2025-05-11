@@ -3,6 +3,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.messages import BaseMessage, ToolMessage, AIMessage, SystemMessage
 from langchain_aws import ChatBedrock
 from langgraph.checkpoint.memory import InMemorySaver
+from loguru import logger
 
 from .state import AgentState
 from .tools.qdrant import search_local_aws_docs
@@ -16,18 +17,18 @@ def should_continue(state: AgentState) -> Literal["continue", "end"]:
     last_message: BaseMessage = state["messages"][-1]
 
     if not isinstance(last_message, AIMessage) or not last_message.tool_calls:
-        print("--- Agent decided to END ---")
+        logger.info("--- Agent decided to END ---")
         return "end"
 
     else:
-        print("--- Agent decided to CONTINUE with tools---")
+        logger.info("--- Agent decided to CONTINUE with tools---")
         return "continue"
 
 
 def call_model(state: AgentState, config: RunnableConfig):
-    print("--- Calling Bedrock Model ---")
+    logger.info("--- Calling Bedrock Model ---")
     model_id = config.get("configurable", {}).get("model", "amazon.nova-micro-v1:0")
-    print(f"Using model: {model_id}")
+    logger.info(f"Using model: {model_id}")
 
     model = ChatBedrock(
         model_id=model_id,
@@ -57,15 +58,15 @@ Keep your answers focused on the user's question.
         pattern = r"<thinking>.*?</thinking>\s*"
         response.content = re.sub(pattern, "", content, flags=re.DOTALL).strip()
 
-    print(f"--- Bedrock Model Response --- \n{response.content}")
+    logger.debug(f"--- Bedrock Model Response --- \n{response.content}")
     if response.tool_calls:
-        print(f"Tool Calls: {response.tool_calls}")
+        logger.debug(f"Tool Calls: {response.tool_calls}")
 
     return {"messages": [response]}
 
 
 def call_tools(state: AgentState) -> dict[str, List[ToolMessage]]:
-    print("--- Calling Tools ---")
+    logger.info("--- Calling Tools ---")
 
     last_message: BaseMessage = state["messages"][-1]
 
@@ -80,7 +81,9 @@ def call_tools(state: AgentState) -> dict[str, List[ToolMessage]]:
         tool_name = tool_call.get("name")
 
         if tool_name not in available_tools:
-            print(f"Warning: Tool '{tool_name}' called by LLM but not available.")
+            logger.warning(
+                f"Warning: Tool '{tool_name}' called by LLM but not available."
+            )
 
             tool_messages.append(
                 ToolMessage(
@@ -94,7 +97,7 @@ def call_tools(state: AgentState) -> dict[str, List[ToolMessage]]:
         tool_input_args = tool_call.get("args", {})
 
         try:
-            print(f"Executing tool: {tool_name} with args: {tool_input_args}")
+            logger.info(f"Executing tool: {tool_name} with args: {tool_input_args}")
             tool_output = selected_tool.invoke(tool_input_args)
 
             if not isinstance(tool_output, str):
@@ -105,7 +108,7 @@ def call_tools(state: AgentState) -> dict[str, List[ToolMessage]]:
             )
 
         except Exception as e:
-            print(f"Error executing tool {tool_name}: {e}")
+            logger.error(f"Error executing tool {tool_name}: {e}")
             tool_messages.append(
                 ToolMessage(
                     content=f"Error executing tool {tool_name}: {str(e)}",
@@ -113,7 +116,7 @@ def call_tools(state: AgentState) -> dict[str, List[ToolMessage]]:
                 )
             )
 
-    print(f"--- Tools Results --- \n{tool_messages}")
+    logger.debug(f"--- Tools Results --- \n{tool_messages}")
 
     return {"messages": tool_messages}
 
@@ -140,6 +143,8 @@ checkpointer = InMemorySaver()
 
 aws_agent_graph = workflow.compile(checkpointer=checkpointer)
 
-print(f"langgraph mermaid diagram: \n{aws_agent_graph.get_graph().draw_mermaid()}")
+logger.debug(
+    f"langgraph mermaid diagram: \n{aws_agent_graph.get_graph().draw_mermaid()}"
+)
 
-print("AWS Agent Graph Compiled!")
+logger.info("AWS Agent Graph Compiled!")

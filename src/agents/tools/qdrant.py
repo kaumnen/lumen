@@ -5,6 +5,7 @@ from ...vector_store.qdrant_manager import (
 from langchain_core.documents import Document
 from typing import List
 import re
+from loguru import logger
 
 MAX_CHARS_PER_RESULT = 10000
 MAX_TOTAL_CHARS = 50000
@@ -18,8 +19,8 @@ def search_local_aws_docs(query: str, num_results: int = 5) -> str:
     You can provide the user's specific question as the 'query' either raw or optimized if you think it will improve the search results.
     You can optionally specify 'num_results' (default is 5) for the number of search results to retrieve.
     """
-    print("--- Executing Qdrant Search Tool ---")
-    print(f"Query: {query}, Limit: {num_results}")
+    logger.debug("--- Executing Qdrant Search Tool ---")
+    logger.debug(f"Query: {query}, Limit: {num_results}")
     try:
         found_docs: List[Document] = search_vectors(query_text=query, limit=num_results)
 
@@ -60,11 +61,11 @@ def search_local_aws_docs(query: str, num_results: int = 5) -> str:
             results_str += entry
             total_chars += len(entry)
 
-        print(f"--- Qdrant Search Tool Results ---\n{results_str}")
+        logger.debug(f"--- Qdrant Search Tool Results ---\n{results_str}")
         return results_str.strip()
 
     except Exception as e:
-        print(f"Error during Qdrant search: {e}")
+        logger.error(f"Error during Qdrant search: {e}")
         return (
             f"An error occurred while searching the local AWS documentation: {str(e)}"
         )

@@ -8,13 +8,9 @@ from langchain_aws import ChatBedrock
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 from typing import List, Dict, Any, Optional
-import logging
+from loguru import logger
 import traceback
 import re
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class MCPChatClient:

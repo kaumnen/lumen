@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from loguru import logger
 from langchain_core.messages import (
     HumanMessage,
     AIMessage,
@@ -19,13 +20,13 @@ st.success(
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
-    print(f"Initialized session_id: {st.session_state.session_id}")
+    logger.info(f"Initialized session_id: {st.session_state.session_id}")
 
     st.session_state.messages = []
     st.session_state.message_count = 0
     st.session_state.tool_calls_count = 0
     st.session_state.token_count = 0
-    print("Initialized messages list and stats in session state.")
+    logger.info("Initialized messages list and stats in session state.")
 
 
 with st.sidebar:
@@ -91,11 +92,11 @@ with st.sidebar:
         st.session_state.message_count = 0
         st.session_state.tool_calls_count = 0
         st.session_state.token_count = 0
-        print("Chat history and stats cleared.")
+        logger.info("Chat history and stats cleared.")
         st.rerun()
 
 
-print(f"Displaying {len(st.session_state.messages)} messages from history.")
+logger.debug(f"Displaying {len(st.session_state.messages)} messages from history.")
 for msg in st.session_state.messages:
     role = "user" if isinstance(msg, HumanMessage) else "assistant"
     with st.chat_message(role):
@@ -122,7 +123,7 @@ for msg in st.session_state.messages:
 
 
 if prompt := st.chat_input("Ask about AWS..."):
-    print(f"User input received: {prompt}")
+    logger.debug(f"User input received: {prompt}")
 
     user_message = HumanMessage(content=prompt)
     st.session_state.messages.append(user_message)
@@ -137,13 +138,13 @@ if prompt := st.chat_input("Ask about AWS..."):
             "model": st.session_state.selected_model,
         }
     }
-    print(f"Invoking agent with config: {config}")
+    logger.debug(f"Invoking agent with config: {config}")
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
                 response_state = aws_agent_graph.invoke(agent_input, config=config)
-                print(f"Agent response state received: {response_state}")
+                logger.debug(f"Agent response state received: {response_state}")
 
                 final_response_message = None
                 tool_activity_details = []
@@ -183,7 +184,7 @@ if prompt := st.chat_input("Ask about AWS..."):
                     )
                     if tool_calls_in_turn > 0:
                         st.session_state.tool_calls_count += tool_calls_in_turn
-                        print(
+                        logger.debug(
                             f"Added {tool_calls_in_turn} tool calls to session total."
                         )
 
@@ -195,9 +196,11 @@ if prompt := st.chat_input("Ask about AWS..."):
                             call_tokens = usage_metadata.get("total_tokens", 0)
                             if call_tokens > 0:
                                 st.session_state.token_count += call_tokens
-                                print(f"Added {call_tokens} tokens to session total.")
+                                logger.debug(
+                                    f"Added {call_tokens} tokens to session total."
+                                )
                             else:
-                                print(
+                                logger.warning(
                                     "Token usage information found but total_tokens is zero or missing."
                                 )
                         else:
@@ -207,19 +210,21 @@ if prompt := st.chat_input("Ask about AWS..."):
                                     call_tokens = usage_metadata.get("total_tokens", 0)
                                     if call_tokens > 0:
                                         st.session_state.token_count += call_tokens
-                                        print(
+                                        logger.debug(
                                             f"Added {call_tokens} tokens (from intermediate step) to session total."
                                         )
                                         break
                             if not usage_metadata or call_tokens == 0:
-                                print(
+                                logger.warning(
                                     "usage_metadata not found on any relevant AIMessage in this turn."
                                 )
                     except Exception as token_ex:
-                        print(f"Could not extract token usage: {token_ex}")
+                        logger.warning(f"Could not extract token usage: {token_ex}")
 
                     st.write(final_response_message.content)
-                    print(f"Added agent response to history: {final_response_message}")
+                    logger.debug(
+                        f"Added agent response to history: {final_response_message}"
+                    )
 
                     if tool_activity_details:
                         with st.expander("Tool Activity (Current Turn)"):
@@ -253,8 +258,8 @@ if prompt := st.chat_input("Ask about AWS..."):
                         st.session_state.messages.append(last_msg_in_state)
                         st.session_state.message_count += 1
                         st.write(last_msg_in_state.content)
-                        print(
-                            f"Warning: Agent ended with a HumanMessage: {last_msg_in_state}"
+                        logger.warning(
+                            f"Agent ended with a HumanMessage: {last_msg_in_state}"
                         )
                     else:
                         response_content = f"Received unexpected final message type: {type(last_msg_in_state)}"
@@ -262,8 +267,8 @@ if prompt := st.chat_input("Ask about AWS..."):
                         st.session_state.messages.append(fallback_message)
                         st.session_state.message_count += 1
                         st.write(response_content)
-                        print(
-                            f"Warning: Last message was not AIMessage: {last_msg_in_state}"
+                        logger.warning(
+                            f"Last message was not AIMessage: {last_msg_in_state}"
                         )
 
                 else:
@@ -274,13 +279,13 @@ if prompt := st.chat_input("Ask about AWS..."):
                     st.session_state.messages.append(error_fallback_msg)
                     st.session_state.message_count += 1
                     st.write(response_content)
-                    print("Error: Empty or invalid response state from agent.")
+                    logger.error("Error: Empty or invalid response state from agent.")
 
             except Exception as e:
                 error_message = f"An error occurred: {e}"
                 error_details = traceback.format_exc()
                 st.error(error_message)
-                print(
+                logger.error(
                     f"Error during agent invocation: {error_message}\n{error_details}"
                 )
 

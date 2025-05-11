@@ -5,11 +5,8 @@ from langchain_core.messages import HumanMessage, AIMessage
 import uuid
 import asyncio
 from src.mcp.client import MCPChatClient
-import logging
+from loguru import logger
 
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 st.title("Chat with AWS MCP Servers")
 st.success(
@@ -105,7 +102,7 @@ with st.sidebar:
         st.rerun()
 
 
-logger.info(f"Displaying {len(st.session_state.messages)} messages from history")
+logger.debug(f"Displaying {len(st.session_state.messages)} messages from history")
 for msg in st.session_state.messages:
     role = "user" if isinstance(msg, HumanMessage) else "assistant"
     with st.chat_message(role):

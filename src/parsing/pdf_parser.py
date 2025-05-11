@@ -1,4 +1,5 @@
 import pymupdf4llm
+from loguru import logger
 from ..utils.pdf import get_pdf_toc
 from ..utils.md import adjust_markdown_headings
 
@@ -38,7 +39,7 @@ def convert_pdf_to_markdown_document_docling(source_location):
     converter_result = converter.convert(source_location)
 
     doc_conversion_secs = converter_result.timings["pipeline_total"].times
-    print(f"Conversion secs: {doc_conversion_secs}")
+    logger.info(f"Conversion secs: {doc_conversion_secs}")
 
     markdown_document = converter_result.document.export_to_markdown()
 
