@@ -14,18 +14,18 @@ st.success(
 )
 
 
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
-    logger.info(f"Initialized new session: {st.session_state.session_id}")
-    st.session_state.messages = []
-    st.session_state.message_count = 0
-    st.session_state.tool_calls_count = 0
-    st.session_state.token_count = 0
+if "mcp_session_id" not in st.session_state:
+    st.session_state.mcp_session_id = str(uuid.uuid4())
+    logger.info(f"Initialized new mcp_session: {st.session_state.mcp_session_id}")
+    st.session_state.mcp_messages = []
+    st.session_state.mcp_message_count = 0
+    st.session_state.mcp_tool_calls_count = 0
+    st.session_state.mcp_token_count = 0
 
 
-if "mcp_client" not in st.session_state:
-    st.session_state.mcp_client = MCPChatClient()
-    logger.info("Initialized MCP client")
+if "mcp_chat_client" not in st.session_state:
+    st.session_state.mcp_chat_client = MCPChatClient()
+    logger.info("Initialized MCP client for mcp_chat")
 
 
 with st.sidebar:
@@ -43,22 +43,22 @@ with st.sidebar:
     selected_model = model_options[selected_model_name]
 
     if (
-        "selected_model" not in st.session_state
-        or st.session_state.selected_model != selected_model
+        "mcp_selected_model" not in st.session_state
+        or st.session_state.mcp_selected_model != selected_model
     ):
-        st.session_state.selected_model = selected_model
-        if len(st.session_state.messages) > 0:
+        st.session_state.mcp_selected_model = selected_model
+        if len(st.session_state.mcp_messages) > 0:
             st.info("Model changed - Starting new conversation")
-            st.session_state.session_id = str(uuid.uuid4())
-            st.session_state.messages = []
-            st.session_state.message_count = 0
-            st.session_state.tool_calls_count = 0
+            st.session_state.mcp_session_id = str(uuid.uuid4())
+            st.session_state.mcp_messages = []
+            st.session_state.mcp_message_count = 0
+            st.session_state.mcp_tool_calls_count = 0
             st.rerun()
 
     st.divider()
 
     st.header("Active MCP Servers")
-    if "mcp_client" in st.session_state:
+    if "mcp_chat_client" in st.session_state:
         server_urls = {
             "Core": "https://awslabs.github.io/mcp/servers/core-mcp-server/",
             "AWS Documentation": "https://awslabs.github.io/mcp/servers/aws-documentation-mcp-server/",
@@ -76,8 +76,8 @@ with st.sidebar:
     info_data = {
         "Metric": ["Messages", "Tool Calls"],
         "Value": [
-            str(st.session_state.message_count),
-            str(st.session_state.tool_calls_count),
+            str(st.session_state.mcp_message_count),
+            str(st.session_state.mcp_tool_calls_count),
         ],
     }
     info_df = pd.DataFrame(info_data)
@@ -92,18 +92,18 @@ with st.sidebar:
     )
 
     if st.button("New Conversation"):
-        st.session_state.session_id = str(uuid.uuid4())
-        st.session_state.messages = []
-        st.session_state.message_count = 0
-        st.session_state.tool_calls_count = 0
+        st.session_state.mcp_session_id = str(uuid.uuid4())
+        st.session_state.mcp_messages = []
+        st.session_state.mcp_message_count = 0
+        st.session_state.mcp_tool_calls_count = 0
         logger.info(
-            f"Started new conversation with session ID: {st.session_state.session_id}"
+            f"Started new conversation with session ID: {st.session_state.mcp_session_id}"
         )
         st.rerun()
 
 
-logger.debug(f"Displaying {len(st.session_state.messages)} messages from history")
-for msg in st.session_state.messages:
+logger.debug(f"Displaying {len(st.session_state.mcp_messages)} messages from history")
+for msg in st.session_state.mcp_messages:
     role = "user" if isinstance(msg, HumanMessage) else "assistant"
     with st.chat_message(role):
         st.write(msg.content)
@@ -129,25 +129,25 @@ for msg in st.session_state.messages:
 
 if prompt := st.chat_input("Ask a question..."):
     user_message = HumanMessage(content=prompt)
-    st.session_state.messages.append(user_message)
-    st.session_state.message_count += 1
+    st.session_state.mcp_messages.append(user_message)
+    st.session_state.mcp_message_count += 1
     st.chat_message("user").write(prompt)
-    logger.info(f"Received new message in session {st.session_state.session_id}")
+    logger.info(f"Received new message in session {st.session_state.mcp_session_id}")
 
     with st.chat_message("assistant"):
         with st.spinner("Processing with MCP tools..."):
             try:
                 response_message, tool_activity = asyncio.run(
-                    st.session_state.mcp_client.process_chat(
+                    st.session_state.mcp_chat_client.process_chat(
                         prompt=prompt,
-                        session_id=st.session_state.session_id,
-                        messages=st.session_state.messages[:-1],
-                        model=st.session_state.selected_model,
+                        session_id=st.session_state.mcp_session_id,
+                        messages=st.session_state.mcp_messages[:-1],
+                        model=st.session_state.mcp_selected_model,
                     )
                 )
 
-                st.session_state.messages.append(response_message)
-                st.session_state.message_count += 1
+                st.session_state.mcp_messages.append(response_message)
+                st.session_state.mcp_message_count += 1
 
                 st.write(response_message.content)
 
@@ -155,7 +155,7 @@ if prompt := st.chat_input("Ask a question..."):
                     1 for activity in tool_activity if "tool_call" in activity
                 )
                 if tool_calls_in_turn > 0:
-                    st.session_state.tool_calls_count += tool_calls_in_turn
+                    st.session_state.mcp_tool_calls_count += tool_calls_in_turn
                     logger.info(
                         f"Added {tool_calls_in_turn} tool calls to session total"
                     )

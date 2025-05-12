@@ -18,15 +18,15 @@ st.success(
 )
 
 
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
-    logger.info(f"Initialized session_id: {st.session_state.session_id}")
+if "rag_session_id" not in st.session_state:
+    st.session_state.rag_session_id = str(uuid.uuid4())
+    logger.info(f"Initialized rag_session_id: {st.session_state.rag_session_id}")
 
-    st.session_state.messages = []
-    st.session_state.message_count = 0
-    st.session_state.tool_calls_count = 0
-    st.session_state.token_count = 0
-    logger.info("Initialized messages list and stats in session state.")
+    st.session_state.rag_messages = []
+    st.session_state.rag_message_count = 0
+    st.session_state.rag_tool_calls_count = 0
+    st.session_state.rag_token_count = 0
+    logger.info("Initialized messages list and stats in rag_session state.")
 
 
 with st.sidebar:
@@ -44,17 +44,17 @@ with st.sidebar:
     selected_model = model_options[selected_model_name]
 
     if (
-        "selected_model" not in st.session_state
-        or st.session_state.selected_model != selected_model
+        "rag_selected_model" not in st.session_state
+        or st.session_state.rag_selected_model != selected_model
     ):
-        st.session_state.selected_model = selected_model
-        if len(st.session_state.messages) > 0:
+        st.session_state.rag_selected_model = selected_model
+        if len(st.session_state.rag_messages) > 0:
             st.info("Model changed - Starting new conversation")
-            st.session_state.session_id = str(uuid.uuid4())
-            st.session_state.messages = []
-            st.session_state.message_count = 0
-            st.session_state.tool_calls_count = 0
-            st.session_state.token_count = 0
+            st.session_state.rag_session_id = str(uuid.uuid4())
+            st.session_state.rag_messages = []
+            st.session_state.rag_message_count = 0
+            st.session_state.rag_tool_calls_count = 0
+            st.session_state.rag_token_count = 0
             st.rerun()
 
     st.divider()
@@ -63,9 +63,9 @@ with st.sidebar:
     info_data = {
         "Metric": ["Messages", "Tool Calls", "Total Tokens"],
         "Value": [
-            str(st.session_state.get("message_count", 0)),
-            str(st.session_state.get("tool_calls_count", 0)),
-            str(st.session_state.get("token_count", 0)),
+            str(st.session_state.get("rag_message_count", 0)),
+            str(st.session_state.get("rag_tool_calls_count", 0)),
+            str(st.session_state.get("rag_token_count", 0)),
         ],
     }
     info_df = pd.DataFrame(info_data)
@@ -87,17 +87,17 @@ with st.sidebar:
     )
 
     if st.button("New Conversation"):
-        st.session_state.messages = []
-        st.session_state.session_id = str(uuid.uuid4())
-        st.session_state.message_count = 0
-        st.session_state.tool_calls_count = 0
-        st.session_state.token_count = 0
-        logger.info("Chat history and stats cleared.")
+        st.session_state.rag_messages = []
+        st.session_state.rag_session_id = str(uuid.uuid4())
+        st.session_state.rag_message_count = 0
+        st.session_state.rag_tool_calls_count = 0
+        st.session_state.rag_token_count = 0
+        logger.info("Chat history and stats cleared for rag_session.")
         st.rerun()
 
 
-logger.debug(f"Displaying {len(st.session_state.messages)} messages from history.")
-for msg in st.session_state.messages:
+logger.debug(f"Displaying {len(st.session_state.rag_messages)} messages from history.")
+for msg in st.session_state.rag_messages:
     role = "user" if isinstance(msg, HumanMessage) else "assistant"
     with st.chat_message(role):
         st.write(msg.content)
@@ -126,16 +126,16 @@ if prompt := st.chat_input("Ask about AWS..."):
     logger.debug(f"User input received: {prompt}")
 
     user_message = HumanMessage(content=prompt)
-    st.session_state.messages.append(user_message)
-    st.session_state.message_count += 1
+    st.session_state.rag_messages.append(user_message)
+    st.session_state.rag_message_count += 1
     st.chat_message("user").write(prompt)
 
     agent_input = {"messages": [user_message]}
 
     config = {
         "configurable": {
-            "thread_id": st.session_state.session_id,
-            "model": st.session_state.selected_model,
+            "thread_id": st.session_state.rag_session_id,
+            "model": st.session_state.rag_selected_model,
         }
     }
     logger.debug(f"Invoking agent with config: {config}")
@@ -174,8 +174,8 @@ if prompt := st.chat_input("Ask about AWS..."):
                         tool_activity_details
                     )
 
-                    st.session_state.messages.append(final_response_message)
-                    st.session_state.message_count += 1
+                    st.session_state.rag_messages.append(final_response_message)
+                    st.session_state.rag_message_count += 1
 
                     tool_calls_in_turn = sum(
                         1
@@ -183,9 +183,9 @@ if prompt := st.chat_input("Ask about AWS..."):
                         if "tool_call" in activity
                     )
                     if tool_calls_in_turn > 0:
-                        st.session_state.tool_calls_count += tool_calls_in_turn
+                        st.session_state.rag_tool_calls_count += tool_calls_in_turn
                         logger.debug(
-                            f"Added {tool_calls_in_turn} tool calls to session total."
+                            f"Added {tool_calls_in_turn} tool calls to rag_session total."
                         )
 
                     try:
@@ -193,31 +193,15 @@ if prompt := st.chat_input("Ask about AWS..."):
                             final_response_message, "usage_metadata", None
                         )
                         if usage_metadata:
-                            call_tokens = usage_metadata.get("total_tokens", 0)
-                            if call_tokens > 0:
-                                st.session_state.token_count += call_tokens
-                                logger.debug(
-                                    f"Added {call_tokens} tokens to session total."
-                                )
-                            else:
-                                logger.warning(
-                                    "Token usage information found but total_tokens is zero or missing."
-                                )
+                            input_tokens = usage_metadata.get("input_tokens", 0)
+                            output_tokens = usage_metadata.get("output_tokens", 0)
+                            total_tokens = usage_metadata.get("total_tokens", 0)
+                            st.session_state.rag_token_count += total_tokens
+                            logger.info(
+                                f"Tokens used: Input={input_tokens}, Output={output_tokens}, Total={total_tokens}. Session total: {st.session_state.rag_token_count}"
+                            )
                         else:
-                            for msg in reversed(response_state["messages"]):
-                                usage_metadata = getattr(msg, "usage_metadata", None)
-                                if usage_metadata:
-                                    call_tokens = usage_metadata.get("total_tokens", 0)
-                                    if call_tokens > 0:
-                                        st.session_state.token_count += call_tokens
-                                        logger.debug(
-                                            f"Added {call_tokens} tokens (from intermediate step) to session total."
-                                        )
-                                        break
-                            if not usage_metadata or call_tokens == 0:
-                                logger.warning(
-                                    "usage_metadata not found on any relevant AIMessage in this turn."
-                                )
+                            logger.warning("Usage metadata not found on the message.")
                     except Exception as token_ex:
                         logger.warning(f"Could not extract token usage: {token_ex}")
 
@@ -255,8 +239,8 @@ if prompt := st.chat_input("Ask about AWS..."):
                 ):
                     last_msg_in_state = response_state["messages"][-1]
                     if isinstance(last_msg_in_state, HumanMessage):
-                        st.session_state.messages.append(last_msg_in_state)
-                        st.session_state.message_count += 1
+                        st.session_state.rag_messages.append(last_msg_in_state)
+                        st.session_state.rag_message_count += 1
                         st.write(last_msg_in_state.content)
                         logger.warning(
                             f"Agent ended with a HumanMessage: {last_msg_in_state}"
@@ -264,8 +248,8 @@ if prompt := st.chat_input("Ask about AWS..."):
                     else:
                         response_content = f"Received unexpected final message type: {type(last_msg_in_state)}"
                         fallback_message = AIMessage(content=response_content)
-                        st.session_state.messages.append(fallback_message)
-                        st.session_state.message_count += 1
+                        st.session_state.rag_messages.append(fallback_message)
+                        st.session_state.rag_message_count += 1
                         st.write(response_content)
                         logger.warning(
                             f"Last message was not AIMessage: {last_msg_in_state}"
@@ -276,8 +260,8 @@ if prompt := st.chat_input("Ask about AWS..."):
                         "Sorry, I received an empty or invalid response state."
                     )
                     error_fallback_msg = AIMessage(content=response_content)
-                    st.session_state.messages.append(error_fallback_msg)
-                    st.session_state.message_count += 1
+                    st.session_state.rag_messages.append(error_fallback_msg)
+                    st.session_state.rag_message_count += 1
                     st.write(response_content)
                     logger.error("Error: Empty or invalid response state from agent.")
 
@@ -292,7 +276,7 @@ if prompt := st.chat_input("Ask about AWS..."):
                 error_ai_message = AIMessage(
                     content="Sorry, an error occurred processing your request."
                 )
-                st.session_state.messages.append(error_ai_message)
-                st.session_state.message_count += 1
+                st.session_state.rag_messages.append(error_ai_message)
+                st.session_state.rag_message_count += 1
 
     st.rerun()
