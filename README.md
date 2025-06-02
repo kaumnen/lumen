@@ -1,4 +1,6 @@
 # lumen
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkaumnen%2Flumen.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkaumnen%2Flumen?ref=badge_shield)
+
 
 `lumen` is an AI-powered assistant designed to help you quickly query AWS documentation and get the answers you need. It uses Retrieval Augmented Generation (RAG), AWS Model Context Protocol (MCP) servers and Amazon's Nova Large Language Models (LLMs).
 
@@ -112,3 +114,7 @@ Rename the `.env.template` file to `.env` and update the following variables:
     ```
 
 You can access the `lumen` app by navigating to the local URL provided in your terminal (usually `http://localhost:8501`) in your browser.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkaumnen%2Flumen.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkaumnen%2Flumen?ref=badge_large)
